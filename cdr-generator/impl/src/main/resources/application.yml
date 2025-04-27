@@ -12,3 +12,5 @@ spring:
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.H2Dialect
+    rabbitmq:
+        addresses: amqp://guest:guest@localhost:5672
