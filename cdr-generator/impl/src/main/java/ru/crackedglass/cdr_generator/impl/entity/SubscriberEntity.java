@@ -6,14 +6,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Table(name = "subscribers")
 @Entity
-public class Subscriber {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SubscriberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "phone_number")
-    String phoneNumber;
+    private String phoneNumber;
 }

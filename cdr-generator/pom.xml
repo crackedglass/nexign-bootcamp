@@ -16,7 +16,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>impl</module>
-        <module>db</module>
     </modules>
 
 </project>

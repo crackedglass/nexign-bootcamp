@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         return new RabbitTemplate(connectionFactory);
     }
 
@@ -21,12 +21,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue queue() {
+    Queue queue() {
         return new Queue("cdr-queue");
     }
 
     @Bean
-    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, Queue queue) {
+    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, Queue queue) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(queue.getName());
