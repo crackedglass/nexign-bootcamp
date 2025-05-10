@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: hrs-001-create-tariffs-table
+      author: app_developer
+      changes:
+        - createTable:
+            tableName: tariffs
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: tariff_type # CLASSIC, MONTHLY
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: outgoing_call_romashka_rate
+                  type: DECIMAL(10, 2)
+              - column:
+                  name: outgoing_call_other_rate
+                  type: DECIMAL(10, 2)
+              - column:
+                  name: incoming_call_rate
+                  type: DECIMAL(10, 2)
+              - column:
+                  name: monthly_fee
+                  type: DECIMAL(10, 2)
+              - column:
+                  name: included_minutes
+                  type: INTEGER
+              - column:
+                  name: fallback_tariff_id # Tariff to use after included minutes are exhausted
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_tariffs_fallback_tariff
+                    references: tariffs(id)
+                    # Not making it nullable:false because classic tariffs won't have this
+
+  - changeSet:
+      id: hrs-002-populate-initial-tariffs
+      author: app_developer
+      # Ensure this changeset runs after the table is created and the fallback tariff (ID 11) exists.
+      # Liquibase processes changesets in order within a file.
+      changes:
+        - insert:
+            tableName: tariffs
+            columns:
+              - column: { name: id, valueNumeric: 11 }
+              - column: { name: name, value: "Классика" }
+              - column: { name: tariff_type, value: "CLASSIC" }
+              - column: { name: outgoing_call_romashka_rate, valueNumeric: 1.50 }
+              - column: { name: outgoing_call_other_rate, valueNumeric: 2.50 }
+              - column: { name: incoming_call_rate, valueNumeric: 0.00 }
+              # monthly_fee, included_minutes, fallback_tariff_id are null for CLASSIC by default (or not applicable)
+
+        - insert:
+            tableName: tariffs
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: name, value: "Помесячный" }
+              - column: { name: tariff_type, value: "MONTHLY" }
+              - column: { name: monthly_fee, valueNumeric: 100.00 }
+              - column: { name: included_minutes, valueNumeric: 50 }
+              - column: { name: fallback_tariff_id, valueNumeric: 11 } # Fallback to Классика (ID 11)
+              # Rates for Помесячный for calls beyond package are taken from fallback_tariff_id 

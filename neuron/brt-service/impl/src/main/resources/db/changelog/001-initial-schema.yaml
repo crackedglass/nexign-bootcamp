@@ -1,0 +1,163 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-subscribers-table
+      author: app_developer
+      changes:
+        - createTable:
+            tableName: subscribers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: VARCHAR(255)
+              - column:
+                  name: msisdn
+                  type: VARCHAR(20)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: balance
+                  type: DECIMAL(10, 2)
+                  defaultValueNumeric: 0.00
+              - column:
+                  name: registration_date
+                  type: DATE
+              - column:
+                  name: tariff_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-call-data-table
+      author: app_developer
+      changes:
+        - createTable:
+            tableName: call_data
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: subscriber_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_call_data_subscriber
+                    references: subscribers(id)
+              - column:
+                  name: call_type
+                  type: VARCHAR(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: peer_msisdn
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_time
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_time
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 003-populate-initial-subscribers
+      author: app_developer
+      changes:
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Иванов Иван Иванович" }
+              - column: { name: msisdn, value: "79001112233" }
+              - column: { name: balance, valueNumeric: 100.00 }
+              - column: { name: registration_date, valueDate: "2024-01-10" }
+              - column: { name: tariff_id, valueNumeric: 11 } # Классика
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Петров Петр Петрович" }
+              - column: { name: msisdn, value: "79002223344" }
+              - column: { name: balance, valueNumeric: 50.00 }
+              - column: { name: registration_date, valueDate: "2024-02-15" }
+              - column: { name: tariff_id, valueNumeric: 12 } # Помесячный
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Сидорова Мария Ивановна" }
+              - column: { name: msisdn, value: "79003334455" }
+              - column: { name: balance, valueNumeric: 200.50 }
+              - column: { name: registration_date, valueDate: "2024-03-20" }
+              - column: { name: tariff_id, valueNumeric: 11 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Кузнецов Алексей Дмитриевич" }
+              - column: { name: msisdn, value: "79004445566" }
+              - column: { name: balance, valueNumeric: 75.25 }
+              - column: { name: registration_date, valueDate: "2024-04-01" }
+              - column: { name: tariff_id, valueNumeric: 12 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Смирнова Ольга Сергеевна" }
+              - column: { name: msisdn, value: "79005556677" }
+              - column: { name: balance, valueNumeric: 120.00 }
+              - column: { name: registration_date, valueDate: "2024-05-10" }
+              - column: { name: tariff_id, valueNumeric: 11 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Васильев Игорь Андреевич" }
+              - column: { name: msisdn, value: "79006667788" }
+              - column: { name: balance, valueNumeric: 30.75 }
+              - column: { name: registration_date, valueDate: "2024-06-15" }
+              - column: { name: tariff_id, valueNumeric: 12 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Михайлова Елена Владимировна" }
+              - column: { name: msisdn, value: "79007778899" }
+              - column: { name: balance, valueNumeric: 250.00 }
+              - column: { name: registration_date, valueDate: "2024-07-01" }
+              - column: { name: tariff_id, valueNumeric: 11 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Новиков Сергей Игоревич" }
+              - column: { name: msisdn, value: "79008889900" }
+              - column: { name: balance, valueNumeric: 90.00 }
+              - column: { name: registration_date, valueDate: "2024-08-05" }
+              - column: { name: tariff_id, valueNumeric: 12 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Федорова Анастасия Павловна" }
+              - column: { name: msisdn, value: "79009990011" }
+              - column: { name: balance, valueNumeric: 150.20 }
+              - column: { name: registration_date, valueDate: "2024-09-12" }
+              - column: { name: tariff_id, valueNumeric: 11 }
+        - insert:
+            tableName: subscribers
+            columns:
+              - column: { name: full_name, value: "Антонов Дмитрий Олегович" }
+              - column: { name: msisdn, value: "79001234567" }
+              - column: { name: balance, valueNumeric: 60.50 }
+              - column: { name: registration_date, valueDate: "2024-10-18" }
+              - column: { name: tariff_id, valueNumeric: 12 } 

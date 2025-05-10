@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-initial-schema.yaml
+  # Add more changelog files here as the schema evolves
+  # - include:
+  #     file: db/changelog/002-add-new-table.yaml 

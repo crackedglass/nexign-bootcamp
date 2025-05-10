@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: hrs-003-create-subscriber-monthly-usage-table
+      author: app_developer
+      changes:
+        - createTable:
+            tableName: subscriber_monthly_usage
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: brt_subscriber_id # Foreign key to BRT.subscribers.id (not enforced by DB constraint here)
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: usage_month # Format YYYY-MM
+                  type: VARCHAR(7)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: used_minutes
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: subscriber_monthly_usage
+            columnNames: brt_subscriber_id, usage_month
+            constraintName: uq_subscriber_month_usage 
