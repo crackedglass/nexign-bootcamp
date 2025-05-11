@@ -15,4 +15,6 @@ public interface CallDetailRecordRepository extends JpaRepository<CallDetailReco
 
     @Query("SELECT c FROM CallDetailRecord c WHERE c.processed = false ORDER BY c.startTime")
     List<CallDetailRecord> findUnprocessedBatch();
+
+    List<CallDetailRecord> findByProcessedFalseOrderByStartTimeAsc();
 } 

@@ -6,6 +6,7 @@ import com.example.cdrgenerator.impl.repository.CallDetailRecordRepository;
 import com.example.cdrgenerator.impl.repository.SubscriberRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,6 @@ public class CallGenerationService {
     private List<Subscriber> subscribers;
     private final ExecutorService executorService = Executors.newFixedThreadPool(10); // For parallel generation
 
-    // Define the simulation period (1 year)
     private static final LocalDateTime SIMULATION_START_DATE = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
     private static final LocalDateTime SIMULATION_END_DATE = LocalDateTime.of(2025, 12, 31, 23, 59, 59);
 
@@ -41,12 +41,7 @@ public class CallGenerationService {
         }
     }
 
-    /**
-     * Generates call data for the entire simulation period.
-     * This method can be triggered via an API endpoint or a scheduled task.
-     */
     public void generateCallsForYear() {
-        // Generate a random number of calls per month for the year
         LocalDateTime currentMonthStart = SIMULATION_START_DATE;
         while (currentMonthStart.isBefore(SIMULATION_END_DATE) || currentMonthStart.isEqual(SIMULATION_END_DATE)) {
             int callsThisMonth = 50 + random.nextInt(150); // Random 50-199 calls per month
@@ -60,10 +55,7 @@ public class CallGenerationService {
         if (subscribers.isEmpty()) return;
 
         for (int i = 0; i < numberOfCalls; i++) {
-            // Submit call generation to thread pool for parallel processing
-            // However, saving to DB must be carefully managed to maintain chronological order if required strictly at write time.
-            // For now, we generate and then sort before creating CDR files.
-            executorService.submit(() -> generateAndSaveSingleCall(periodStart, periodEnd));
+           executorService.submit(() -> generateAndSaveSingleCall(periodStart, periodEnd));
         }
     }
 
@@ -119,7 +111,6 @@ public class CallGenerationService {
         }
     }
 
-    // For graceful shutdown
     public void shutdown() {
         executorService.shutdown();
         try {
