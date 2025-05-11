@@ -49,7 +49,9 @@ public class TariffService {
                 tariff.getIncomingCallRate(),
                 tariff.getMonthlyFee(),
                 tariff.getIncludedMinutes(),
-                tariff.getFallbackTariffId()
+                tariff.getFallbackTariffId(),
+                null,
+                null
         );
     }
 } 
