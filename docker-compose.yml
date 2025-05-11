@@ -12,7 +12,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=password
 
   postgres:
-    image: postgres:14
+    image: postgres:17
     container_name: postgres
     ports:
       - "5432:5432"
