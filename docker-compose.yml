@@ -1,0 +1,95 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=billing_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cdr-generator:
+    build:
+      context: ./cdr-generator
+      dockerfile: Dockerfile
+    container_name: cdr-generator
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:cdrdb # Using H2 for cdr-generator as per spec
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  brt-service:
+    build:
+      context: ./brt-service
+      dockerfile: Dockerfile
+    container_name: brt-service
+    depends_on:
+      - rabbitmq
+      - postgres
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/billing_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate # Liquibase will handle schema
+      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:/db/changelog/db.changelog-master.yaml
+
+  hrs-service:
+    build:
+      context: ./hrs-service
+      dockerfile: Dockerfile
+    container_name: hrs-service
+    depends_on:
+      - rabbitmq
+      - postgres # Assuming HRS might need its own tables or to read tariff info
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/billing_db # Sharing DB with BRT or can have its own
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate # Liquibase will handle schema
+      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:/db/changelog/db.changelog-master.yaml
+
+  crm-service:
+    build:
+      context: ./crm-service
+      dockerfile: Dockerfile
+    container_name: crm-service
+    depends_on:
+      - brt-service # For REST API calls
+      - hrs-service # For REST API calls (if any direct interaction)
+    ports:
+      - "8084:8080"
+    environment:
+      # Add environment variables for BRT and HRS service URLs for Feign clients
+      - BRT_SERVICE_URL=http://brt-service:8080
+      - HRS_SERVICE_URL=http://hrs-service:8080
+
+volumes:
+  rabbitmq_data:
+  postgres_data: 
